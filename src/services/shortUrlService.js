@@ -11,6 +11,10 @@ export class ShortUrlService {
    * @returns {Promise<string>} 短链接
    */
   static async generateShortUrl($axios, longUrl) {
+    if (!CONSTANTS.SHORT_URL_API) {
+      throw new Error("短链接服务未配置");
+    }
+
     // 构建请求数据
     const formData = new FormData();
     formData.append("longUrl", btoa(longUrl));

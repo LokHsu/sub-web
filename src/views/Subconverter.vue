@@ -27,27 +27,31 @@
 
               <div v-if="advanced === '2'">
                 <el-form-item label="后端地址:">
-                  <el-autocomplete style="width: 100%" v-model="form.customBackend" :fetch-suggestions="backendSearch"
-                    placeholder="动动小手，（建议）自行搭建后端服务。例：http://127.0.0.1:25500/sub?">
-                    <el-button slot="append" @click="gotoGayhub" icon="el-icon-link">前往项目仓库</el-button>
-                  </el-autocomplete>
-                </el-form-item>
-                <el-form-item label="远程配置:">
-                  <el-select v-model="form.remoteConfig" allow-create filterable placeholder="请选择" style="width: 100%">
-                    <el-option-group v-for="group in options.remoteConfig" :key="group.label" :label="group.label">
-                      <el-option v-for="item in group.options" :key="item.value" :label="item.label"
-                        :value="item.value"></el-option>
-                    </el-option-group>
-                    <el-button slot="append" @click="gotoRemoteConfig" icon="el-icon-link">配置示例</el-button>
+                  <el-select v-model="form.customBackend" allow-create filterable 
+                    default-first-option style="width: 100%" placeholder="请选择（可自行输入后端地址）">
+                    <el-option v-for="(item, index) in options.backendOptions"
+                      :key="index" :label="item.label" :value="item.value"></el-option>
                   </el-select>
                 </el-form-item>
-                <el-form-item label="Include:">
+                <el-form-item label="远程配置:">
+                  <div style="display: flex; width: 100%;">
+                    <el-select v-model="form.remoteConfig" allow-create filterable placeholder="请选择"
+                      style="flex: 1; width: auto;" class="remote-config-select">
+                      <el-option-group v-for="group in options.remoteConfig" :key="group.label" :label="group.label">
+                        <el-option v-for="item in group.options" :key="item.value" :label="item.label"
+                          :value="item.value"></el-option>
+                      </el-option-group>
+                    </el-select>
+                    <el-button @click="gotoRemoteConfig" class="remote-config-button" icon="el-icon-link" type="info" plain>查看配置示例</el-button>
+                </div>
+                </el-form-item>
+                <el-form-item label="包含节点:">
                   <el-input v-model="form.includeRemarks" placeholder="节点名包含的关键字，支持正则" />
                 </el-form-item>
-                <el-form-item label="Exclude:">
+                <el-form-item label="排除节点:">
                   <el-input v-model="form.excludeRemarks" placeholder="节点名不包含的关键字，支持正则" />
                 </el-form-item>
-                <el-form-item label="FileName:">
+                <el-form-item label="输出文件名:">
                   <el-input v-model="form.filename" placeholder="返回的订阅文件名" />
                 </el-form-item>
 
@@ -209,6 +213,7 @@
 import { CONSTANTS } from '@/config/constants';
 import { CLIENT_TYPES } from '@/config/client-types';
 import { REMOTE_CONFIGS } from '@/config/remote-configs';
+import { BACKEND_CONFIGS } from '@/config/backend-configs';
 
 // 导入Composables
 import { useSubscriptionForm, addCustomParam, saveSubUrl as saveSubscriptionUrl } from '@/composables/useSubscriptionForm';
@@ -240,7 +245,7 @@ export default {
       // 配置选项
       options: {
         clientTypes: CLIENT_TYPES,
-        backendOptions: [{ value: "http://127.0.0.1:25500/sub?" }],
+        backendOptions: BACKEND_CONFIGS,
         remoteConfig: REMOTE_CONFIGS
       },
 
@@ -315,10 +320,6 @@ export default {
 
     goToProject() {
       window.open(CONSTANTS.PROJECT);
-    },
-
-    gotoGayhub() {
-      window.open(CONSTANTS.BACKEND_RELEASE);
     },
 
     gotoRemoteConfig() {
@@ -444,20 +445,6 @@ export default {
       });
     },
 
-    backendSearch(queryString, cb) {
-      const results = this.backendSearchSuggestions(queryString, this.options.backendOptions);
-      cb(results);
-    },
-
-    backendSearchSuggestions(queryString, backends) {
-      if (queryString) {
-        return backends.filter(backend => {
-          return backend.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
-        });
-      }
-      return backends;
-    },
-
     async getBackendVersion() {
       this.backendVersion = await BackendService.getBackendVersion(this.$axios);
     },
@@ -491,3 +478,22 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.remote-config-select :deep(.el-input__inner) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.remote-config-button {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  margin-left: -1px;
+  padding: 0 15px;
+}
+:deep(.remote-config-button:hover),
+:deep(.remote-config-button:focus) {
+  background-color: #F4F4F5 !important;
+  border-color: #D3D4D6 !important;
+  color: #909399 !important;
+}
+</style>
