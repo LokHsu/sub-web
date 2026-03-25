@@ -14,8 +14,7 @@ export function useSubscription() {
   const buildBaseUrl = (form, processedSubUrl, currentBackend) => {
     return currentBackend +
       "target=" + form.clientType +
-      "&url=" + encodeURIComponent(processedSubUrl) +
-      "&insert=" + form.insert;
+      "&url=" + encodeURIComponent(processedSubUrl);
   };
 
   /**
@@ -24,13 +23,35 @@ export function useSubscription() {
    * @returns {string} 参数字符串
    */
   const buildBooleanParams = (form) => {
-    return "&emoji=" + form.emoji.toString() +
-      "&list=" + form.nodeList.toString() +
-      "&tfo=" + form.tfo.toString() +
-      "&scv=" + form.scv.toString() +
-      "&fdn=" + form.fdn.toString() +
-      "&expand=" + form.expand.toString() +
-      "&sort=" + form.sort.toString();
+    let params = "";
+
+    if (form.emoji === true) {
+      params += "&emoji=" + form.emoji.toString();
+    }
+
+    if (form.tfo === true) {
+      params += "&tfo=" + form.tfo.toString();
+    }
+
+    if (form.scv === true) {
+      params += "&scv=" + form.scv.toString();
+    }
+
+    if (form.sort === true) {
+      params += "&sort=" + form.sort.toString();
+    }
+
+    // 过滤目标类型不支持的节点 API 默认为 true
+    if (form.fdn === false) {
+      params += "&fdn=" + form.fdn.toString();
+    }
+
+    // 转换规则列表 API 默认为 true
+    if (form.expand === false) {
+      params += "&expand=" + form.expand.toString();
+    }
+
+    return params;
   };
 
   /**
@@ -104,7 +125,7 @@ export function useSubscription() {
     params += buildBooleanParams(form);
 
     // UDP 参数
-    if (needUdp) {
+    if (needUdp && form.udp === true) {
       params += "&udp=" + form.udp.toString();
     }
 

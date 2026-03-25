@@ -24,15 +24,15 @@
                   <el-option v-for="(v, k) in options.clientTypes" :key="k" :label="k" :value="v"></el-option>
                 </el-select>
               </el-form-item>
-
-              <div v-if="advanced === '2'">
-                <el-form-item label="后端地址:">
+              <el-form-item label="后端地址:">
                   <el-select v-model="form.customBackend" allow-create filterable 
                     default-first-option style="width: 100%" placeholder="请选择（可自行输入后端地址）">
                     <el-option v-for="(item, index) in options.backendOptions"
                       :key="index" :label="item.label" :value="item.value"></el-option>
                   </el-select>
                 </el-form-item>
+
+              <div v-if="advanced === '2'">
                 <el-form-item label="远程配置:">
                   <div style="display: flex; width: 100%;">
                     <el-select v-model="form.remoteConfig" allow-create filterable placeholder="请选择"
@@ -46,13 +46,13 @@
                 </div>
                 </el-form-item>
                 <el-form-item label="包含节点:">
-                  <el-input v-model="form.includeRemarks" placeholder="节点名包含的关键字，支持正则" />
+                  <el-input v-model="form.includeRemarks" placeholder="节点名包含的关键字，支持正则（可选）" />
                 </el-form-item>
                 <el-form-item label="排除节点:">
-                  <el-input v-model="form.excludeRemarks" placeholder="节点名不包含的关键字，支持正则" />
+                  <el-input v-model="form.excludeRemarks" placeholder="节点名不包含的关键字，支持正则（可选）" />
                 </el-form-item>
                 <el-form-item label="输出文件名:">
-                  <el-input v-model="form.filename" placeholder="返回的订阅文件名" />
+                  <el-input v-model="form.filename" placeholder="返回的订阅文件名（可选）" />
                 </el-form-item>
 
                 <el-form-item v-for="(param, i) in customParams" :key="i">
@@ -67,29 +67,40 @@
                 <el-form-item label-width="0px">
                   <el-row type="flex">
                     <el-col>
-                      <el-checkbox v-model="form.nodeList" label="输出为 Node List" border></el-checkbox>
+                      <el-checkbox v-model="form.nodeList" label="仅输出节点信息" border></el-checkbox>
                     </el-col>
                     <el-popover placement="bottom" v-model="form.extraset">
                       <el-row>
-                        <el-checkbox v-model="form.emoji" label="Emoji"></el-checkbox>
+                        <el-checkbox v-model="form.emoji" label="添加 Emoji"></el-checkbox>
+                        <el-popover placement="top-start" trigger="hover" width="180" 
+                          content="⚠️ 若节点或配置文件本身存在 Emoji，会重复添加。">
+                          <i slot="reference" style="margin-left: 10px;" class="el-icon-info info-icon"></i>
+                        </el-popover>
                       </el-row>
                       <el-row>
                         <el-checkbox v-model="form.scv" label="跳过证书验证"></el-checkbox>
                       </el-row>
                       <el-row>
+                        <el-checkbox v-model="form.tfo" label="启用 TFO"></el-checkbox>
+                      </el-row>
+                      <el-row>
                         <el-checkbox v-model="form.udp" @change="needUdp = true" label="启用 UDP"></el-checkbox>
                       </el-row>
                       <el-row>
-                        <el-checkbox v-model="form.appendType" label="节点类型"></el-checkbox>
+                        <el-checkbox v-model="form.appendType" label="显示节点类型"></el-checkbox>
                       </el-row>
                       <el-row>
-                        <el-checkbox v-model="form.sort" label="排序节点"></el-checkbox>
+                        <el-checkbox v-model="form.sort" label="节点排序"></el-checkbox>
                       </el-row>
                       <el-row>
                         <el-checkbox v-model="form.fdn" label="过滤非法节点"></el-checkbox>
                       </el-row>
                       <el-row>
-                        <el-checkbox v-model="form.expand" label="规则展开"></el-checkbox>
+                        <el-checkbox v-model="form.expand" label="展开规则"></el-checkbox>
+                        <el-popover placement="top-start" trigger="hover" width="180" 
+                          content="将配置的分流规则直接写入配置文件，而不是保留链接">
+                          <i slot="reference" style="margin-left: 10px;" class="el-icon-info info-icon"></i>
+                        </el-popover>
                       </el-row>
                       <el-button slot="reference">更多选项</el-button>
                     </el-popover>
@@ -99,9 +110,6 @@
                       </el-row>
                       <el-row>
                         <el-checkbox v-model="form.tpl.clash.doh" label="Clash.DoH"></el-checkbox>
-                      </el-row>
-                      <el-row>
-                        <el-checkbox v-model="form.insert" label="网易云"></el-checkbox>
                       </el-row>
                       <el-button slot="reference">定制功能</el-button>
                     </el-popover>
@@ -344,6 +352,11 @@ export default {
     },
 
     makeUrlClick() {
+      if (!this.form.customBackend) {
+        this.$message.warning('请先选择或输入后端地址');
+        return;
+      }
+
       const url = this.makeUrl(this.form, this.advanced, this.processedSubUrl, this.currentBackend, this.customParams, this.needUdp);
       if (url) {
         this.customSubUrl = url;
@@ -495,5 +508,8 @@ export default {
   background-color: #F4F4F5 !important;
   border-color: #D3D4D6 !important;
   color: #909399 !important;
+}
+.info-icon:hover {
+  color: #409EFF;
 }
 </style>

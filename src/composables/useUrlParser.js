@@ -74,7 +74,6 @@ export function useUrlParser() {
 
       // Set other form properties based on the URL parameters
       form.sourceSubUrl = params.get("url").replace(/\|/g, "\n");
-      form.insert = params.get("insert") === "true";
       form.remoteConfig = params.get("config");
       form.excludeRemarks = params.get("exclude");
       form.includeRemarks = params.get("include");

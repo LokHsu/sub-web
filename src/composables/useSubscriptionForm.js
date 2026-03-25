@@ -15,17 +15,16 @@ export function useSubscriptionForm() {
       excludeRemarks: "",
       includeRemarks: "",
       filename: "",
-      emoji: true,
-      nodeList: false,
-      extraset: false,
-      sort: false,
-      udp: false,
-      tfo: false,
+      extraset: false, // 内部字段
+      emoji: false, // 默认
+      nodeList: false, // 默认
+      sort: false, // 默认
+      udp: false, // 默认
+      tfo: false, // 默认
       scv: true,
-      fdn: false,
-      expand: true,
-      appendType: false,
-      insert: false, // 是否插入默认订阅的节点，对应配置项 insert_url
+      fdn: true, // 默认
+      expand: true, // 默认
+      appendType: false, // 默认
       new_name: true, // 是否使用 Clash 新字段
 
       // tpl 定制功能
